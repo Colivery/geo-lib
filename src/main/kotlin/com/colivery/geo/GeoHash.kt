@@ -1,5 +1,7 @@
 package com.colivery.geo
 
+import com.colivery.geo.Distance.Companion.coordinatesWhenTravelingInDirectionForDistance
+
 data class Bounds(val sw: Coordinate, val ne: Coordinate)
 data class Neighbors(val nw: String, val n: String, val ne: String,
                      val w: String, val e: String,
@@ -145,6 +147,19 @@ class GeoHash {
                     adjacent(geohash, "s"),
                     adjacent(adjacent(geohash, "s"), "e")
             )
+        }
+
+        @JvmStatic
+        fun buildMinMaxGeoHashesOfCircle(startLocation: Coordinate, radius: Float): Pair<String, String> {
+            val north = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 0f)
+            val east = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 90f)
+            val south = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 180f)
+            val west = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 270f)
+
+            val min = encode(south.latitude, west.longitude)
+            val max = encode(north.latitude, east.longitude)
+
+            return Pair(min, max)
         }
     }
 }
