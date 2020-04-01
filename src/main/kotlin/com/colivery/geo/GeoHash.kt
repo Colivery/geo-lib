@@ -1,5 +1,7 @@
 package com.colivery.geo
 
+import com.colivery.geo.Distance.Companion.coordinatesWhenTravelingInDirectionForDistance
+
 data class Bounds(val sw: Coordinate, val ne: Coordinate)
 data class Neighbors(val nw: String, val n: String, val ne: String,
                      val w: String, val e: String,
@@ -149,99 +151,15 @@ class GeoHash {
 
         @JvmStatic
         fun buildMinMaxGeoHashesOfCircle(startLocation: Coordinate, radius: Float): Pair<String, String> {
-            val north = Distance.coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 0f)
-            val east = Distance.coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 90f)
-            val south = Distance.coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 180f)
-            val west = Distance.coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 270f)
+            val north = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 0f)
+            val east = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 90f)
+            val south = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 180f)
+            val west = coordinatesWhenTravelingInDirectionForDistance(startLocation, radius, 270f)
 
             val min = encode(south.latitude, west.longitude)
             val max = encode(north.latitude, east.longitude)
 
             return Pair(min, max)
-
-        }
-
-        @JvmStatic
-        fun buildGeoHashesCoveringCircle(startLocation: Coordinate, radius: Float): MutableSet<String> {
-            val initialGeoHash = encode(startLocation.latitude, startLocation.longitude)
-            val bounds = bounds(initialGeoHash)
-            val neighbours = neighbours(initialGeoHash)
-
-            val geoHashes = mutableSetOf(initialGeoHash)
-            testE(startLocation, radius, bounds, geoHashes, neighbours.e)
-            testSE(startLocation, radius, bounds, geoHashes, neighbours.se)
-            testS(startLocation, radius, bounds, geoHashes, neighbours.s)
-            testSW(startLocation, radius, bounds, geoHashes, neighbours.sw)
-            testW(startLocation, radius, bounds, geoHashes, neighbours.w)
-            testNW(startLocation, radius, bounds, geoHashes, neighbours.nw)
-            testN(startLocation, radius, bounds, geoHashes, neighbours.n)
-            testNE(startLocation, radius, bounds, geoHashes, neighbours.ne)
-
-            return geoHashes
-        }
-
-        private fun testE(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(startLocation.latitude, bounds.ne.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testE(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).e)
-            }
-        }
-
-        private fun testSE(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.sw.latitude, bounds.ne.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testSE(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).se)
-                testS(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).s)
-                testE(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).e)
-            }
-        }
-
-        private fun testS(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.sw.latitude, startLocation.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testS(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).s)
-            }
-        }
-
-        private fun testSW(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.sw.latitude, bounds.sw.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testSW(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).sw)
-                testS(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).s)
-                testW(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).w)
-            }
-        }
-
-        private fun testW(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(startLocation.latitude, bounds.sw.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testW(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).w)
-            }
-        }
-
-        private fun testNW(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.ne.latitude, bounds.sw.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testNW(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).nw)
-                testN(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).n)
-                testW(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).w)
-            }
-        }
-
-        private fun testN(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.ne.latitude, startLocation.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testN(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).n)
-            }
-        }
-
-        private fun testNE(startLocation: Coordinate, radius: Float, bounds: Bounds, geoHashes: MutableSet<String>, geoHash: String) {
-            if (Distance.haversine(startLocation, Coordinate(bounds.ne.latitude, bounds.ne.longitude)) < radius) {
-                geoHashes.add(geoHash)
-                testNE(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).ne)
-                testN(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).n)
-                testE(startLocation, radius, bounds(geoHash), geoHashes, neighbours(geoHash).e)
-            }
         }
     }
 }

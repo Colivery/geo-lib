@@ -18,14 +18,14 @@ class Distance {
 
         @JvmStatic
         fun coordinatesWhenTravelingInDirectionForDistance(coordinate: Coordinate, distance: Float, bearing: Float): Coordinate {
-            val latitudeInRadians =  Math.toRadians(coordinate.latitude)
-            val longitudeInRadians =  Math.toRadians(coordinate.longitude)
-            val latitude = Math.asin(Math.sin(latitudeInRadians) * Math.cos(distance / earthRadiusKm) +
+            val latitudeInRadians = Math.toRadians(coordinate.latitude)
+            val longitudeInRadians = Math.toRadians(coordinate.longitude)
+            val latitudeInRadians2 = Math.asin(Math.sin(latitudeInRadians) * Math.cos(distance / earthRadiusKm) +
                     Math.cos(latitudeInRadians) * Math.sin(distance / earthRadiusKm) * Math.cos(bearing.toDouble()))
-            val longitude = longitudeInRadians + Math.atan2(
+            val longitudeInRadians2 = longitudeInRadians + Math.atan2(
                     Math.sin(bearing.toDouble()) * Math.sin(distance / earthRadiusKm) * Math.cos(latitudeInRadians),
                     Math.cos(distance / earthRadiusKm) - Math.sin(latitudeInRadians) * Math.sin(latitudeInRadians))
-            return Coordinate(Math.toDegrees(latitude), Math.toDegrees(longitude))
+            return Coordinate(Math.toDegrees(latitudeInRadians2), Math.toDegrees(longitudeInRadians2))
         }
     }
 }
