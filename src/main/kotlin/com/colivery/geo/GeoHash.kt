@@ -59,6 +59,22 @@ class GeoHash {
         }
 
         @JvmStatic
+        fun decode(geohash: String): Coordinate {
+
+            val bounds = bounds(geohash); // <-- the hard work
+
+            val latMin = bounds.sw.latitude
+            val lonMin = bounds.sw.longitude
+            val latMax = bounds.ne.latitude
+            val lonMax = bounds.ne.longitude;
+
+            val lat = (latMin + latMax) / 2
+            val lon = (lonMin + lonMax) / 2
+
+            return Coordinate(latitude = lat, longitude = lon)
+        }
+
+        @JvmStatic
         fun bounds(p_geohash: String): Bounds {
             var geohash = p_geohash
             if (geohash.isEmpty()) throw Exception("Invalid geohash")
