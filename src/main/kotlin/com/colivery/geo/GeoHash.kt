@@ -14,7 +14,7 @@ class GeoHash {
         @JvmStatic
         fun encode(lat: Double, lon: Double, precision: Int = 5): String {
             var idx = 0 // index into base32 map
-            var bit = 0 // each char holds 5 bits
+            var bit = 0 // each char holds 5 bitseo
             var evenBit = true
             var geohash = ""
 
